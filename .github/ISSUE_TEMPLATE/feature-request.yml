@@ -1,0 +1,30 @@
+name: ✨ Feature Request
+title: "[FEATURE] "
+description: Suggest a new feature or improvement
+labels: ["enhancement"]
+assignees: []
+
+body:
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Description
+      description: What do you want to achieve?
+      placeholder: |
+        - I would like to ...
+        - Right now it is inconvenient because ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: How could this feature look? What do you roughly have in mind?
+      placeholder: |
+        Example:
+        - New button ...
+        - New screen / view ...
+        - Option in the settings ...
+    validations:
+      required: true

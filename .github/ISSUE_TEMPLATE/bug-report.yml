@@ -1,0 +1,50 @@
+name: 🐞 Bug Report
+title: '[BUG]'
+description: File a bug report
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Detailed description of the issue that you're seeing. You can add screenshots and videos as well
+      placeholder: What is wrong?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Describe all the steps to show the behavior that you have observed.
+      placeholder: |
+        1. Open the app
+        2. Go to "Meters" and select meter X
+        3. Tap on "Add reading"
+        4. Enter a value and tap "Save"
+        5. The app crashes / an error message appears: "Could not save reading"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platforms-affected
+    attributes:
+      label: Affected platform(s)
+      description: Where are you seeing this issue?
+      multiple: true
+      options:
+        - Android
+        - iOS
+    validations:
+      required: true
+
+  - type: textarea
+    id: app-version
+    attributes:
+      label: App version (optional)
+      description: If you know it, please enter the app version (e.g. 3.2.210).
+      placeholder: 3.2.210
+    validations:
+      required: false

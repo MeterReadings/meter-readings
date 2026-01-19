@@ -26,7 +26,7 @@ jobs:
               "✅ This issue has been marked as **fixed in the latest beta version** of the app.",
               "",
               "You can download the current beta APK here:",
-              "👉 https://github.com/MeterReadings/meter-readings-apk/releases/latest",
+              "👉 https://github.com/MeterReadings/meter-readings-apk/releases",
               "",
               "Please install that beta build, try to reproduce the problem again,",
               "and then leave a comment in this issue to confirm whether the bug is really fixed.",

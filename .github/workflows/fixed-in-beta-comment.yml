@@ -6,8 +6,8 @@ on:
 
 jobs:
   comment-when-fixed-in-beta:
-    # Nur ausführen, wenn das Label "fixedInBeta" gesetzt wurde
-    if: contains(github.event.issue.labels.*.name, 'status/fixedInBeta')
+    # Nur ausführen, wenn das neu hinzugefügte Label "fixedInBeta" ist
+    if: github.event.label.name == 'status/fixedInBeta'
     runs-on: ubuntu-latest
 
     steps:
@@ -18,16 +18,20 @@ jobs:
           script: |
             const issueNumber = context.payload.issue.number;
 
-            const body = `
-✅ This issue has been marked as **fixed in the latest beta version** of the app.
+            const lines = [
+              "✅ This issue has been marked as **fixed in the latest beta version** of the app.",
+              "",
+              "You can download the current beta APK here:",
+              "👉 https://github.com/MeterReadings/meter-readings-apk/releases/latest/download/MeterReadings-beta-latest.apk",
+              "",
+              "Please install the beta, try to reproduce the problem again,",
+              "and let me know in this issue whether the bug is really fixed.",
+              "",
+              "_Hinweis (Deutsch):_ Vor der Installation unbedingt ein Datenbank-Backup machen",
+              "(App → Einstellungen → Datenbankeinstellungen → Datenbank exportieren)."
+            ];
 
-You can download the current beta APK here:
-👉 https://github.com/MeterReadings/meter-readings-apk/releases/latest/download/MeterReadings-beta-latest.apk
-
-Please install the beta, try to reproduce the problem again and let me know in this issue whether the bug is really fixed.
-
-*Hinweis:* Vor der Installation unbedingt ein Datenbank-Backup machen (App → Einstellungen → Datenbankeinstellungen → Datenbank exportieren).
-`;
+            const body = lines.join("\n");
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,

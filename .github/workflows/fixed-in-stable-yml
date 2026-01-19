@@ -1,0 +1,45 @@
+name: Comment when fixed in stable
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  comment-when-fixed-in-stable:
+    # Nur ausführen, wenn das neu hinzugefügte Label "fixedInStable" ist
+    if: github.event.label.name == 'status/fixedInStable'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add comment with stable download link
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = context.payload.issue.number;
+
+            // Repo-Infos robust aus Umgebungsvariable holen
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+            console.log(`owner=${owner}, repo=${repo}, issue=${issueNumber}`);
+
+            const lines = [
+              "✅ This issue has been marked as **fixed in the latest stable version** of the app.",
+              "",
+              "You can download the current stable APK here:",
+              "👉 https://github.com/MeterReadings/meter-readings-apk/releases",
+              "",
+              "Please install that stable build, try to reproduce the problem again,",
+              "and then leave a comment in this issue to confirm whether the bug is really fixed.",
+              "",
+              "**Important:** Before installing the apk, create a backup of your database:",
+              "App → Settings → Database settings → Export database (save it to local storage, not to a cloud folder)."
+            ];
+
+            const body = lines.join("\n");
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              body
+            });

@@ -1,0 +1,37 @@
+name: Comment when fixed in beta
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  comment-when-fixed-in-beta:
+    # Nur ausführen, wenn das Label "fixedInBeta" gesetzt wurde
+    if: contains(github.event.issue.labels.*.name, 'status/fixedInBeta')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add comment with beta download link
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = context.payload.issue.number;
+
+            const body = `
+✅ This issue has been marked as **fixed in the latest beta version** of the app.
+
+You can download the current beta APK here:
+👉 https://github.com/MeterReadings/meter-readings-apk/releases/latest/download/MeterReadings-beta-latest.apk
+
+Please install the beta, try to reproduce the problem again and let me know in this issue whether the bug is really fixed.
+
+*Hinweis:* Vor der Installation unbedingt ein Datenbank-Backup machen (App → Einstellungen → Datenbankeinstellungen → Datenbank exportieren).
+`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              issue_number: issueNumber,
+              body
+            });

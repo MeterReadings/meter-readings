@@ -5,7 +5,7 @@ on:
     types: [labeled]
 
 jobs:
-  comment-when-fixed-in-beta:
+  comment-when-added-in-beta:
     # Nur ausführen, wenn das neu hinzugefügte Label "addedInBeta" ist
     if: github.event.label.name == 'status/addedInBeta'
     runs-on: ubuntu-latest

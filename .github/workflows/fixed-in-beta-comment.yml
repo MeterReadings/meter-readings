@@ -18,6 +18,10 @@ jobs:
           script: |
             const issueNumber = context.payload.issue.number;
 
+            // Repo-Infos robust aus Umgebungsvariable holen
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+            console.log(`owner=${owner}, repo=${repo}, issue=${issueNumber}`);
+
             const lines = [
               "✅ This issue has been marked as **fixed in the latest beta version** of the app.",
               "",
@@ -34,8 +38,8 @@ jobs:
             const body = lines.join("\n");
 
             await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.name,
+              owner,
+              repo,
               issue_number: issueNumber,
               body
             });

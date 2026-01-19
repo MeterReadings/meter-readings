@@ -1,0 +1,45 @@
+name: Comment when added in beta
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  comment-when-fixed-in-beta:
+    # Nur ausführen, wenn das neu hinzugefügte Label "addedInBeta" ist
+    if: github.event.label.name == 'status/addedInBeta'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add comment with beta download link
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = context.payload.issue.number;
+
+            // Repo-Infos robust aus Umgebungsvariable holen
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+            console.log(`owner=${owner}, repo=${repo}, issue=${issueNumber}`);
+
+            const lines = [
+              "✅ This feature is now **available in the latest beta version** of the app.",
+              "",
+              "You can download the current beta build here:",
+              "👉 https://github.com/MeterReadings/meter-readings-apk/releases",
+              "",
+              "Please install that beta build and try out the new feature.",
+              "After testing, leave a comment in this issue with your feedback or if something does not work as expected.",
+              "",
+              "**Important:** Before installing the beta, create a backup of your database:",
+              "App → Settings → Database settings → Export database (save it to local storage, not to a cloud folder)."
+            ];
+
+            const body = lines.join("\n");
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              body
+            });

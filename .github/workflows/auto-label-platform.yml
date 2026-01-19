@@ -1,0 +1,70 @@
+name: Auto label by affected platform
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  label-by-platform:
+    runs-on: ubuntu-latest
+
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Add platform labels from issue form
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body || "";
+
+            // Wir suchen den Abschnitt "### Affected platform(s)" aus dem Issue-Body
+            const headerRegex = /###\s*Affected platform\(s\)[\s\S]*?(?=###|$)/i;
+            const sectionMatch = body.match(headerRegex);
+
+            if (!sectionMatch) {
+              console.log("Section 'Affected platform(s)' nicht gefunden.");
+              return;
+            }
+
+            const section = sectionMatch[0].toLowerCase();
+
+            const labelsToAdd = new Set();
+
+            // Wenn "both" gewählt wurde -> beide Labels
+            if (section.includes("both")) {
+              labelsToAdd.add("platform/Android");
+              labelsToAdd.add("platform/iOS");
+            } else {
+              if (section.includes("android")) {
+                labelsToAdd.add("platform/Android");
+              }
+              if (section.includes("ios")) {
+                labelsToAdd.add("platform/iOS");
+              }
+            }
+
+            if (labelsToAdd.size === 0) {
+              console.log("Keine passenden Plattformen gefunden.");
+              return;
+            }
+
+            const existing = issue.labels.map(l => l.name);
+            const finalLabels = [...labelsToAdd].filter(l => !existing.includes(l));
+
+            if (finalLabels.length === 0) {
+              console.log("Alle Labels sind bereits vorhanden.");
+              return;
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: finalLabels
+            });
+
+            console.log("Labels hinzugefügt:", finalLabels);

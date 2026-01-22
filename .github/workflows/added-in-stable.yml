@@ -23,7 +23,7 @@ jobs:
             console.log(`owner=${owner}, repo=${repo}, issue=${issueNumber}`);
 
             const lines = [
-              "✅ This feature is now **available in the latest beta version** of the app.",
+              "✅ This feature is now **available in the latest stable version** of the app.",
               "",
               "You can download the current stable build here:",
               "👉 https://github.com/MeterReadings/meter-readings-apk/releases",

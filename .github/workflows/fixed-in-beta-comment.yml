@@ -1,48 +1,63 @@
-- name: Add comment with beta download link
-  uses: actions/github-script@v7
-  with:
-    github-token: ${{ secrets.GITHUB_TOKEN }}
-    script: |
-      const issueNumber = context.payload.issue.number;
+name: Comment when added in beta
 
-      // Issue-Repo (da wird kommentiert)
-      const [issueOwner, issueRepo] = process.env.GITHUB_REPOSITORY.split("/");
+on:
+  issues:
+    types: [labeled]
 
-      // Release-Repo (da liegen die Betas!)
-      const releaseOwner = "MeterReadings";
-      const releaseRepo  = "meter-readings-apk";
+permissions:
+  issues: write
+  contents: read
 
-      // Neueste Beta (prerelease oder Tag enthält "beta") holen
-      const { data: releases } = await github.rest.repos.listReleases({
-        owner: releaseOwner,
-        repo: releaseRepo,
-        per_page: 50
-      });
+jobs:
+  comment-when-added-in-beta:
+    if: github.event.label.name == 'status/addedInBeta'
+    runs-on: ubuntu-latest
 
-      const latestBeta = releases.find(r =>
-        !r.draft && (r.prerelease || /beta/i.test(r.tag_name || r.name || ""))
-      );
+    steps:
+      - name: Add comment with beta download link
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = context.payload.issue.number;
 
-      const betaVersion = latestBeta?.tag_name || latestBeta?.name || "unknown";
+            // Repo, in dem das Issue ist (da kommentieren wir)
+            const [issueOwner, issueRepo] = process.env.GITHUB_REPOSITORY.split("/");
 
-      const lines = [
-        "✅ This issue has been marked as fixed in the latest beta version of the app.",
-        "",
-        `Version ${betaVersion}`,
-        "",
-        "You can download the current beta APK here:",
-        "👉 https://github.com/MeterReadings/meter-readings-apk/releases",
-        "",
-        "Please install that beta build, try to reproduce the problem again,",
-        "and then leave a comment in this issue to confirm whether the bug is really fixed.",
-        "",
-        "Important: Before installing the beta, create a backup of your database:",
-        "App → Settings → Database settings → Export database (save it to local storage, not to a cloud folder)."
-      ];
+            // Repo, in dem die Beta-Releases liegen
+            const releaseOwner = "MeterReadings";
+            const releaseRepo  = "meter-readings-apk";
 
-      await github.rest.issues.createComment({
-        owner: issueOwner,
-        repo: issueRepo,
-        issue_number: issueNumber,
-        body: lines.join("\n")
-      });
+            const { data: releases } = await github.rest.repos.listReleases({
+              owner: releaseOwner,
+              repo: releaseRepo,
+              per_page: 50
+            });
+
+            const latestBeta = releases.find(r =>
+              !r.draft && (r.prerelease || /beta/i.test(r.tag_name || r.name || ""))
+            );
+
+            const betaVersion = latestBeta?.tag_name || latestBeta?.name || "unknown";
+
+            const lines = [
+              "✅ This issue has been marked as fixed in the latest beta version of the app.",
+              "",
+              `Version ${betaVersion}`,
+              "",
+              "You can download the current beta APK here:",
+              "👉 https://github.com/MeterReadings/meter-readings-apk/releases",
+              "",
+              "Please install that beta build, try to reproduce the problem again,",
+              "and then leave a comment in this issue to confirm whether the bug is really fixed.",
+              "",
+              "Important: Before installing the beta, create a backup of your database:",
+              "App → Settings → Database settings → Export database (save it to local storage, not to a cloud folder)."
+            ];
+
+            await github.rest.issues.createComment({
+              owner: issueOwner,
+              repo: issueRepo,
+              issue_number: issueNumber,
+              body: lines.join("\n")
+            });

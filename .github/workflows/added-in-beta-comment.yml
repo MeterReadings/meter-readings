@@ -51,7 +51,7 @@ jobs:
               "Please install that beta build, try to reproduce the problem again,",
               "and then leave a comment in this issue to confirm whether the bug is really fixed.",
               "",
-              **"Important:** Before installing the beta, create a backup of your database:",
+              "**Important:** Before installing the beta, create a backup of your database:",
               "App → Settings → Database settings → Export database (save it to local storage, not to a cloud folder)."
             ];
 

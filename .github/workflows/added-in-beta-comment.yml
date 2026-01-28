@@ -4,9 +4,12 @@ on:
   issues:
     types: [labeled]
 
+permissions:
+  issues: write
+  contents: read
+
 jobs:
   comment-when-added-in-beta:
-    # Nur ausführen, wenn das neu hinzugefügte Label "addedInBeta" ist
     if: github.event.label.name == 'status/addedInBeta'
     runs-on: ubuntu-latest
 
@@ -18,28 +21,43 @@ jobs:
           script: |
             const issueNumber = context.payload.issue.number;
 
-            // Repo-Infos robust aus Umgebungsvariable holen
-            const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-            console.log(`owner=${owner}, repo=${repo}, issue=${issueNumber}`);
+            // Repo, in dem das Issue ist (da kommentieren wir)
+            const [issueOwner, issueRepo] = process.env.GITHUB_REPOSITORY.split("/");
+
+            // Repo, in dem die Beta-Releases liegen
+            const releaseOwner = "MeterReadings";
+            const releaseRepo  = "meter-readings-apk";
+
+            const { data: releases } = await github.rest.repos.listReleases({
+              owner: releaseOwner,
+              repo: releaseRepo,
+              per_page: 50
+            });
+
+            const latestBeta = releases.find(r =>
+              !r.draft && (r.prerelease || /beta/i.test(r.tag_name || r.name || ""))
+            );
+
+            const betaVersion = latestBeta?.tag_name || latestBeta?.name || "unknown";
 
             const lines = [
               "✅ This feature is now **available in the latest beta version** of the app.",
               "",
-              "You can download the current beta build here:",
+              `Version ${betaVersion}`,
+              "",
+              "You can download the current beta APK here:",
               "👉 https://github.com/MeterReadings/meter-readings-apk/releases",
               "",
-              "Please install that beta build and try out the new feature.",
-              "After testing, leave a comment in this issue with your feedback or if something does not work as expected.",
+              "Please install that beta build, try to reproduce the problem again,",
+              "and then leave a comment in this issue to confirm whether the bug is really fixed.",
               "",
-              "**Important:** Before installing the beta, create a backup of your database:",
+              "Important: Before installing the beta, create a backup of your database:",
               "App → Settings → Database settings → Export database (save it to local storage, not to a cloud folder)."
             ];
 
-            const body = lines.join("\n");
-
             await github.rest.issues.createComment({
-              owner,
-              repo,
+              owner: issueOwner,
+              repo: issueRepo,
               issue_number: issueNumber,
-              body
+              body: lines.join("\n")
             });

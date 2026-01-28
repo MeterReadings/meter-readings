@@ -1,4 +1,4 @@
-name: Comment when added in beta
+name: Comment when fixed in beta
 
 on:
   issues:
@@ -41,9 +41,9 @@ jobs:
             const betaVersion = latestBeta?.tag_name || latestBeta?.name || "unknown";
 
             const lines = [
-              "✅ This issue has been marked as fixed in the latest beta version of the app.",
+              "✅ This issue has been marked as **fixed in the latest beta version** of the app.",
               "",
-              `Version ${betaVersion}`,
+              **`Version ${betaVersion}`**,
               "",
               "You can download the current beta APK here:",
               "👉 https://github.com/MeterReadings/meter-readings-apk/releases",
@@ -51,7 +51,7 @@ jobs:
               "Please install that beta build, try to reproduce the problem again,",
               "and then leave a comment in this issue to confirm whether the bug is really fixed.",
               "",
-              "Important: Before installing the beta, create a backup of your database:",
+              "**Important:** Before installing the beta, create a backup of your database:",
               "App → Settings → Database settings → Export database (save it to local storage, not to a cloud folder)."
             ];
 

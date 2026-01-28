@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   comment-when-added-in-beta:
-    if: github.event.label.name == 'status/addedInBeta'
+    if: github.event.label.name == 'status/fixedInBeta'
     runs-on: ubuntu-latest
 
     steps:

@@ -48,8 +48,8 @@ jobs:
               "You can download the current beta APK here:",
               "👉 https://github.com/MeterReadings/meter-readings-apk/releases",
               "",
-              "Please install that beta build, try to reproduce the problem again,",
-              "and then leave a comment in this issue to confirm whether the bug is really fixed.",
+              "Please install that beta build and try out the new feature.",
+              "After testing, leave a comment in this issue with your feedback or if something does not work as expected.",
               "",
               "**Important:** Before installing the beta, create a backup of your database:",
               "App → Settings → Database settings → Export database (save it to local storage, not to a cloud folder)."

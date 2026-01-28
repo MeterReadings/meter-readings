@@ -43,7 +43,7 @@ jobs:
             const lines = [
               "✅ This issue has been marked as **fixed in the latest beta version** of the app.",
               "",
-              **`Version ${betaVersion}`**,
+              `**Version ${betaVersion}**`,
               "",
               "You can download the current beta APK here:",
               "👉 https://github.com/MeterReadings/meter-readings-apk/releases",

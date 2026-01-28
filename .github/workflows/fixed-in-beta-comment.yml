@@ -22,8 +22,20 @@ jobs:
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
             console.log(`owner=${owner}, repo=${repo}, issue=${issueNumber}`);
 
+            // Neueste Beta (prerelease) holen
+            const { data: releases } = await github.rest.repos.listReleases({
+              owner,
+              repo,
+              per_page: 50
+            });
+
+            const latestBeta = releases.find(r => r.prerelease && !r.draft);
+            const betaVersion = latestBeta?.tag_name ?? "unknown";
+
             const lines = [
               "✅ This issue has been marked as **fixed in the latest beta version** of the app.",
+              "",
+              `Version ${betaVersion}`,
               "",
               "You can download the current beta APK here:",
               "👉 https://github.com/MeterReadings/meter-readings-apk/releases",

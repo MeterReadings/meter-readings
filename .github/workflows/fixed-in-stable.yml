@@ -4,9 +4,12 @@ on:
   issues:
     types: [labeled]
 
+permissions:
+  issues: write
+  contents: read
+
 jobs:
   comment-when-fixed-in-stable:
-    # Nur ausführen, wenn das neu hinzugefügte Label "fixedInStable" ist
     if: github.event.label.name == 'status/fixedInStable'
     runs-on: ubuntu-latest
 
@@ -18,12 +21,29 @@ jobs:
           script: |
             const issueNumber = context.payload.issue.number;
 
-            // Repo-Infos robust aus Umgebungsvariable holen
-            const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-            console.log(`owner=${owner}, repo=${repo}, issue=${issueNumber}`);
+            const [issueOwner, issueRepo] = process.env.GITHUB_REPOSITORY.split("/");
+            
+            const releaseOwner = "MeterReadings";
+            const releaseRepo  = "meter-readings-apk";
+            
+            const { data: releases } = await github.rest.repos.listReleases({
+              owner: releaseOwner,
+              repo: releaseRepo,
+              per_page: 50
+            });
+            
+            const latestStable = releases.find(r =>
+              !r.draft &&
+              !r.prerelease &&
+              !/beta/i.test((r.tag_name || "") + " " + (r.name || ""))
+            );
+
+            const stableVersion = latestStable?.tag_name || latestStable?.name || "unknown";
 
             const lines = [
               "✅ This issue has been marked as **fixed in the latest stable version** of the app.",
+              "",
+              `**Version ${stableVersion}**`,
               "",
               "You can download the current stable APK here:",
               "👉 https://github.com/MeterReadings/meter-readings-apk/releases",
@@ -35,11 +55,9 @@ jobs:
               "App → Settings → Database settings → Export database (save it to local storage, not to a cloud folder)."
             ];
 
-            const body = lines.join("\n");
-
             await github.rest.issues.createComment({
-              owner,
-              repo,
+              owner: issueOwner,
+              repo: issueRepo,
               issue_number: issueNumber,
-              body
+              body: lines.join("\n")
             });
